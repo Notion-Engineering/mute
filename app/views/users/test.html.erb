@@ -1,0 +1,54 @@
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
+<div ng-controller="BobController" ng-init="init()">
+	<input type="text" id="bob" ng-keydown="bobSearch($event)">
+	<div id="suggestions">
+		<div ng-repeat="s in suggestions" id="n{{$index}}" class="option" ng-click="select($index)" >
+			<p ng-show="s.name == '' || s.name == null || s.name == undefined">{{ s }}</p>
+			{{ s.name }}
+		</div>
+	</div>
+</div>
+
+<div ng-controller="contentController" style="width:40%; margin-left:30%">
+<p align="center"><button ng-click="decide()">Enviar</button> </p>
+
+	<ul id="playlist" type="none" ng-show="adv_songs.length != 0">
+		<button onclick="build_playlist()">CREAR LISTAS</button>
+		<li ng-repeat="so in adv_songs" class="songs_to_play" data-spotify="{{spotify_adv_songs_ids[$index]}}" data-deezer="{{deezer_adv_songs_ids[$index]}}">
+			<b>{{so.title}}</b>-{{so.artist_name}}
+		</li>
+	</ul>
+
+
+	<div ng-show="suggestions.length != 0">
+		<ul>
+			<li ng-repeat="s in suggestions">
+				<div><strong>{{s.name}}</strong>
+				<p><span ng-click="similarArtist(s.name)"> More like this</span> - <span ng-click="topTracks(s.foreign_ids)">Top Tracks</span></p>
+				</div>
+			</li>
+		</ul>
+	</div>
+
+
+	<h4>Puede que algunas canciones no estén disponibles en alguna plataforma</h4>
+	<iframe id="playlisting" class="playButton" src="/json?a=LOADING" width="80" height="80" frameborder="0" allowtransparency="true"></iframe>
+	<iframe id="deezerPlaylist" scrolling="no" frameborder="0" allowTransparency="true" src="/json?a=LOADING" width="80" height="80"></iframe>
+</div>
+
+<style>
+	#bob{
+		width: 80%;
+		min-height: 60px;
+		font-size: 20px;
+	}
+	.option{
+		border: 1px solid #333;
+		padding: 10px;
+		display: table-row;
+		background-color: #f9f9f9;
+	}
+	.active, .option:hover{
+		background-color: rgba(50,50,200,.5);
+	}
+</style>

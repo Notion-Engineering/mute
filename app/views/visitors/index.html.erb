@@ -1,2 +1,83 @@
+<div id="dz-root"></div>
+<script src="http://cdn-files.deezer.com/js/min/dz.js"></script>
+<script>
+	
+</script>
+
 <h3>Welcome</h3>
 <p><%= link_to 'Users:', users_path %> <%= User.count %> registered</p>
+<div ng-controller="mainController" ng-init="init()">
+</div>
+<script>
+	application.controller('mainController', function($scope, $http ) {
+		$scope.init = function(){
+			$scope.token = "";
+			$scope.r_token = "";
+			$http({
+				method: 'POST',
+				url: "https://accounts.spotify.com/api/token",
+				headers: {
+				   'Authorization': "Basic ZWUwZjRlZWZmZDZhNGNlMTgzYTgwYmFhMDY2MTc2Zjg6ZDlhMDExOGYwYWE3NDA0OGJiZDQ5ZjIwOWYyYjEwMjk="
+				 },
+ 				data: {
+ 					code: "<%= @code %>",
+ 					grant_type: "authorization_code",
+ 					redirect_uri: "http://lvh.me:3000/json"
+ 				}
+	        }).success(function(data) {
+	            if(typeof(data) == 'object'){
+	                $scope.token = data.access_token;
+	                $scope.r_token = data.refresh_token;
+	                console.log(data.access_token);
+	            }else{
+	                alert('Error al intentar recuperar los datos de spotify. AUTH NAO');
+	            }
+	        }).
+	        error(function(e) {
+	            console.log(e);
+	        });
+		}
+	});
+	//  https://accounts.spotify.com/authorize/?client_id=' + client_id + '&response_type=code&redirect_uri=http://localhost:3000/callback&scope=' + str_permissions + '&state=b210jn0&show_dialog=false
+
+	// https://accounts.spotify.com/authorize/?client_id=ee0f4eeffd6a4ce183a80baa066176f8&response_type=token&redirect_uri=http://lvh.me:3000/callback&scope=playlist-read-private playlist-modify-public playlist-modify-private&state=b210jn0&show_dialog=false
+
+    // https://accounts.spotify.com/api/token
+ /*
+
+	{"code"=>"AQDoUeWcpowfIuiULR3PAwcdXwUHb7WN8XLp2ozIy_nrpsodDQ5Jil2axm3yShEReX7V37xRHb9jHi-vf-yU9n3f0SFGMIk8j1faZsVK-8-wV2kDP4ShZAcdQR4SBBw6G77RG0hoibxLXOyLqWpAjmkOsDJuZxgIZNI2qa7wt0a_3Vky3oV8cjFEsbW-stY9jXsWtIHj0rx1fjClw-43yCabgOJiLQTp0CTHMHmd6WyoSGMnIJJOs1icJsyv82X9FDJL4QmgsF2BusrTbTznHIZUfQc8RlM3Kw", "state"=>"b210jn0", "controller"=>"visitors", "action"=>"callback"}
+
+ 
+	//$.get("https://accounts.spotify.com/authorize").done(function(){});
+	$.post("https://accounts.spotify.com/api/token", {
+			code: "AQDoUeWcpowfIuiULR3PAwcdXwUHb7WN8XLp2ozIy_nrpsodDQ5Jil2axm3yShEReX7V37xRHb9jHi-vf-yU9n3f0SFGMIk8j1faZsVK-8-wV2kDP4ShZAcdQR4SBBw6G77RG0hoibxLXOyLqWpAjmkOsDJuZxgIZNI2qa7wt0a_3Vky3oV8cjFEsbW-stY9jXsWtIHj0rx1fjClw-43yCabgOJiLQTp0CTHMHmd6WyoSGMnIJJOs1icJsyv82X9FDJL4QmgsF2BusrTbTznHIZUfQc8RlM3Kw", 
+			redirect_uri: "http://lvh.me:3000",
+			grant_type: "authorization_code",
+			client_id: "ee0f4eeffd6a4ce183a80baa066176f8",
+			client_secret: "d9a0118f0aa74048bbd49f209f2b1029"
+		}).done(function(data){
+			console.log(data);
+		});
+	var permissions = [
+		"playlist-read-private",
+		"playlist-modify-public",
+		"playlist-modify-private"
+	];
+	var client_id = "ee0f4eeffd6a4ce183a80baa066176f8"
+	ee0f4eeffd6a4ce183a80baa066176f8:d9a0118f0aa74048bbd49f209f2b1029*/
+	var code = "";
+	function ss(){
+		$.get("https://accounts.spotify.com/authorize/?client_id=ee0f4eeffd6a4ce183a80baa066176f8&response_type=token&redirect_uri=http://lvh.me:3000/json&scope=playlist-read-private playlist-modify-public playlist-modify-private&state=b210jn0&show_dialog=false").done(function(data){
+			console.log(data);
+		});
+	}
+	function a() {
+		$.ajax({
+		  type: "POST",
+		  url: "https://accounts.spotify.com/api/token",
+		  data: { code: "<%= @code %>", grant_type: "authorization_code", redirect_uri: "http://lvh.me:3000/json", client_id: "ee0f4eeffd6a4ce183a80baa066176f8", client_secret: "d9a0118f0aa74048bbd49f209f2b1029"}
+		}).done(function( data ) {
+		    console.log( data );
+		  });
+	}
+</script>
