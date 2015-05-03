@@ -24,4 +24,8 @@ class UsersController < ApplicationController
     render json: response
   end
 
+  def user_params
+    params.require(:user).permit(:name) ## Rails 4 strong params usage
+  end
+
 end

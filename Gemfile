@@ -1,5 +1,4 @@
 source 'https://rubygems.org'
-ruby '2.1.2'
 gem 'rails', '4.2.0'
 gem 'sqlite3'
 gem 'sass-rails', '~> 5.0'
@@ -10,10 +9,10 @@ gem 'turbolinks'
 gem 'jbuilder', '~> 2.0'
 gem 'rack-cors', :require => 'rack/cors'
 gem 'rest-client', '~> 1.7.3'
+gem 'acts-as-taggable-on', '~> 3.4'
 group :development, :test do
   gem 'byebug'
   gem 'web-console', '~> 2.0'
-  gem 'spring'
 end
 gem 'devise'
 group :development do

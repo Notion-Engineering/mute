@@ -4,7 +4,7 @@
 	
 </script>
 
-<h3>Welcome</h3>
+<h3>Welcome</h3> <%= @code %>
 <p><%= link_to 'Users:', users_path %> <%= User.count %> registered</p>
 <div ng-controller="mainController" ng-init="init()">
 </div>
@@ -50,7 +50,7 @@
  
 	//$.get("https://accounts.spotify.com/authorize").done(function(){});
 	$.post("https://accounts.spotify.com/api/token", {
-			code: "AQDoUeWcpowfIuiULR3PAwcdXwUHb7WN8XLp2ozIy_nrpsodDQ5Jil2axm3yShEReX7V37xRHb9jHi-vf-yU9n3f0SFGMIk8j1faZsVK-8-wV2kDP4ShZAcdQR4SBBw6G77RG0hoibxLXOyLqWpAjmkOsDJuZxgIZNI2qa7wt0a_3Vky3oV8cjFEsbW-stY9jXsWtIHj0rx1fjClw-43yCabgOJiLQTp0CTHMHmd6WyoSGMnIJJOs1icJsyv82X9FDJL4QmgsF2BusrTbTznHIZUfQc8RlM3Kw", 
+			code: "<%= @code %>", 
 			redirect_uri: "http://lvh.me:3000",
 			grant_type: "authorization_code",
 			client_id: "ee0f4eeffd6a4ce183a80baa066176f8",

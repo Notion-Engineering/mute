@@ -1,3 +1,15 @@
+/*
+ Dear Dev, 
+ When I Wrote this code only I and God knew
+ what it was... Now only God knows.
+
+ So if you are done trying to optimize this
+ and failed please increment the next counter
+ as a warning to other dudes:
+
+ var total_hours_used_here: 35
+*/
+
 var application = angular.module('Mute', []);
 var talkingAbout = "nothing";
 application.controller('BobController', function($scope, $http) {
@@ -12,12 +24,15 @@ application.controller('BobController', function($scope, $http) {
 
             {subject: "nowdays_top_songs", looks_like: "top music"},
             {subject: "nowdays_top_songs", looks_like: "Top songs of today"},
+            {subject: "nowdays_top_songs", looks_like: "nowdays top songs"},
+            {subject: "nowdays_top_songs", looks_like: "today top music"},
 
             {subject: "mood", looks_like: "I'm feeling"},
             {subject: "mood", looks_like: "I am"},
 
             {subject: "based_on", looks_like: "play something of"},
             {subject: "based_on", looks_like: "match"},
+            {subject: "based_on", looks_like: "mix"},
             {subject: "based_on", looks_like: "something like"},
 
             {subject: "Similar", looks_like: "find artists like"},
@@ -25,6 +40,7 @@ application.controller('BobController', function($scope, $http) {
         ];
         $scope.alerts = [];
         $scope.alerts["moreThanOneAlert"] = "You are only allowed to write 1 parameter";
+        $scope.alerts["moreThanRequiredAlert"] = "You're not allowed to add any parameter, dude.";
 
 
         $scope.init = function(){
@@ -39,6 +55,7 @@ application.controller('BobController', function($scope, $http) {
                 var scores = Bayes.guess( $("#bob").val() );
                 if($scope.subjects[i].subject ==  Bayes.extractWinner(scores).label ){
                     console.log(Bayes.extractWinner(scores).label);
+                    $("#topic").text(Bayes.extractWinner(scores).label);
                     $scope.actions($scope.subjects[i]);
                     window.talkingAbout = $scope.subjects[i].subject;
                     break;
@@ -52,7 +69,7 @@ application.controller('BobController', function($scope, $http) {
             }
         };
 
-        $scope.actions = function(subject){
+        $scope.actions = function(subject){ // AJAX autocomplete
             $scope.suggestions = [];
 
             var sug = $("#bob").val().split(":")[0];
@@ -68,13 +85,34 @@ application.controller('BobController', function($scope, $http) {
                     $scope.suggestions.push($scope.alerts["moreThanOneAlert"]);
                 }
             };
+
+            if(subject.subject == "artist_top_songs"){
+                if($("#bob").val().split(",").length <= 1){
+                    $scope.suggestArtist();
+                    for (var i = 0; i < $scope.examples.length; i++) {
+                        $scope.suggestions.push(sug + " " + $scope.examples[i].name);
+                    };
+                }else{
+                    talkingAbout = "nothing";
+                    $scope.examples = [];
+                    $scope.suggestions.push($scope.alerts["moreThanOneAlert"]);
+                }
+            };
+
             if(subject.subject == "based_on"){
                 $scope.suggestArtist();
                 for (var i = 0; i < $scope.examples.length; i++) {
                     $scope.suggestions.push(sug + " " + $scope.examples[i].name);
                 };
             };
-            console.log($scope.suggestions);
+            
+            if(subject.subject == "nowdays_top_songs"){
+                if($("#bob").val().indexOf(":") != -1 ){
+                    talkingAbout = "nothing";
+                    $scope.examples = [];
+                    $scope.suggestions.push($scope.alerts["moreThanRequiredAlert"]);
+                }
+            }
         };
 
 
@@ -128,19 +166,37 @@ application.controller('BobController', function($scope, $http) {
             });
             return ret;
         };
-
+        /*
+        
+        |*********************************|
+        |                                 |
+        |                                 |
+        |        ACTIONS, I mean          |
+        |       the real actions          |
+        |                                 |
+        |*********************************|
+        
+        */
     }).controller('contentController', function($scope, $http) {
         $scope.adv_songs = [];
         $scope.spotify_adv_songs_ids = [];
         $scope.deezer_adv_songs_ids = [];
         $scope.suggestions = [];
+        $scope.ids = [];
 
-        $scope.decide = function(){
+        $scope.decide = function(){  // Get what bob thinks the user is trying to say and take action
             if("Similar" == window.talkingAbout){
                 $scope.similarArtist($("#bob").val());
             }
             if("based_on" == window.talkingAbout){
                 $scope.smart_playisting($("#bob").val());
+            }
+            if("artist_top_songs" == window.talkingAbout){
+                var art = $("#bob").val();
+                art = art.split(": ")[art.split(": ").length-1];
+                seed = art.split(",")[0];
+                console.log(seed);
+                $scope.getArtistIds(seed, $scope.topTracks);
             }
         };
         
@@ -175,6 +231,24 @@ application.controller('BobController', function($scope, $http) {
             console.log(spotify_url);
             $scope.spotify(spotify_url);
         }
+        
+        $scope.getArtistIds = function(artist, callback){
+            $scope.ids = [];
+            var a = "";
+            $http({
+                method: 'GET', url: "http://developer.echonest.com/api/v4/artist/profile?api_key=ZCSQWTH1IHKZYUWVX&name=" + artist + "&bucket=id:deezer&bucket=id:spotify"
+            }).success(function(data){
+                $scope.ids = data.response.artist.foreign_ids;
+                console.log(data.response.artist.foreign_ids);
+                if(callback != ""){
+                    callback(data.response.artist.foreign_ids);
+                    console.log("ds");
+                }
+            }).error(function(){
+                console.log("Unable to do something with your query dude");
+            });
+            console.log($scope.ids);
+        };
 
         $scope.topTracks = function(ids){
             console.log(ids);
@@ -187,19 +261,19 @@ application.controller('BobController', function($scope, $http) {
                     case "deezer":
                         $.ajax({
                             dataType: "jsonp",
-                            url :"http://api.deezer.com/artist/" + ids[i].foreign_id.split(':')[2] + "/top",
+                            url :"http://api.deezer.com/artist/" + ids[i].foreign_id.split(':')[2] + "/top?output=jsonp&limit=10",
                             data : {},
                             jsonp : 'callback',
                             success : function(data) {
-                                d = JSON.parse(data);
+                                d = data;
                                 console.log(d);
-                                /*_dz = d.data;
+                                _dz = d.data;
                                 console.log(d);
                                 for (var i = 0; i < _dz.length; i++) {
                                     dz.push(_dz[i].id);
                                 };
                                 console.log(dz);
-                                $("#deezerPlaylist").attr("src","http://www.deezer.com/plugins/player?autoplay=false&playlist=true&width=80&height=80&cover=true&title=MUTEPLAYLIST&format=horizontal&app_id=139673&type=tracks&id=" + dz.toString());*/
+                                $("#deezerPlaylist").attr("src","http://www.deezer.com/plugins/player?autoplay=false&playlist=true&width=480&height=480&cover=true&title=MUTEPLAYLIST&format=horizontal&app_id=139673&type=tracks&id=" + dz.toString());
                             }
                         });
                     break;
@@ -218,14 +292,6 @@ application.controller('BobController', function($scope, $http) {
                     break;
                 }
             };
-            /*for (var i = 0; i < _sp.length; i++) {
-                dz.push(_dz[i].id);
-                sp.push(_sp[i].id);
-            };
-            console.log(_sp);
-            console.log(_dz);
-            $("#playlisting").attr("src","https://embed.spotify.com/?uri=spotify:trackset:MUTEPLAYLIST:" + sp.toString());
-            $("#deezerPlaylist").attr("src","http://www.deezer.com/plugins/player?autoplay=false&playlist=true&width=80&height=80&cover=true&title=MUTEPLAYLIST&format=horizontal&app_id=139673&type=tracks&id=" + dz.toString());*/
         };
 
         $scope.spotify = function(url){
@@ -284,7 +350,7 @@ function build_playlist(){
     
 }
 
-function callback(){
-
+function callback(data){
+    alert(data);
 }
 
