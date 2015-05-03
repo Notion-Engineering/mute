@@ -1,7 +1,7 @@
 class VisitorsController < ApplicationController
 
   	def index
-  		@code = params[:code] 
+  		@code = params[:code]
   	end
 
 	def r_json

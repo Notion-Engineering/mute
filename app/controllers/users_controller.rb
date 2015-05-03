@@ -19,13 +19,17 @@ class UsersController < ApplicationController
   def callback
   end
 
+
+
   def final_callback
-    response = RestClient.get 'https://accounts.spotify.com/authorize/?client_id=ee0f4eeffd6a4ce183a80baa066176f8&response_type=token&redirect_uri=http://lvh.me:3000/callback&scope=playlist-read-private playlist-modify-public playlist-modify-private&state=b210jn0&show_dialog=false'
-    render json: response
+    begin 
+      response = RestClient.get 'http://api.spotify.com/v1/me', {:Authorization => "Bearer " + params[:access_token]}
+      render json: response  
+    rescue
+      render text: "<script> window.location = 'https://accounts.spotify.com/authorize/?client_id=ee0f4eeffd6a4ce183a80baa066176f8&response_type=token&redirect_uri=http://lvh.me:3000/callback&scope=playlist-read-private playlist-modify-public playlist-modify-private user-library-modify user-library-read&state=b210jn0&show_dialog=true'</script>"
+    end
   end
 
-  def user_params
-    params.require(:user).permit(:name) ## Rails 4 strong params usage
-  end
+  
 
 end
