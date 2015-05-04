@@ -11,7 +11,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150503005550) do
+ActiveRecord::Schema.define(version: 20150503174930) do
+
+  create_table "similarity_coefficients", force: :cascade do |t|
+    t.integer  "user1"
+    t.integer  "user2"
+    t.float    "coefficient"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+  end
 
   create_table "taggings", force: :cascade do |t|
     t.integer  "tag_id"

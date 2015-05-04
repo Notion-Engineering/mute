@@ -19,8 +19,6 @@ class UsersController < ApplicationController
   def callback
   end
 
-
-
   def final_callback
     begin 
       response = RestClient.get 'http://api.spotify.com/v1/me', {:Authorization => "Bearer " + params[:access_token]}
@@ -30,6 +28,8 @@ class UsersController < ApplicationController
     end
   end
 
-  
+  def user_params
+    params.require(:user).permit(:name, :tag_list) ## Rails 4 strong params usage
+  end
 
 end
