@@ -7,4 +7,5 @@ Rails.application.routes.draw do
   get '/callback/final' => 'users#final_callback'
   get '/test' => 'users#test'
   get '/json' => 'visitors#r_json'
+  get '/api/user/:about/:id' => 'users#user_requests'
 end

@@ -16,6 +16,12 @@ class UsersController < ApplicationController
   def test
   end
 
+  def user_requests
+    if(params[:about] == "artist") 
+      render json: User.find(params[:id]).band_list
+    end
+  end
+
   def callback
   end
 
